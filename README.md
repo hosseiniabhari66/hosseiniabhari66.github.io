@@ -74,4 +74,6 @@ Alternative fallback if you do not want settings:
 
 - Google Scholar has no official public API; this method relies on scraping and may
   occasionally fail due to anti-bot protections.
+- GitHub-hosted runners can be blocked by Scholar; in that case, rerun later or use
+  a personal/self-hosted runner for higher reliability.
 - If a run fails, rerun the workflow later from the Actions tab.

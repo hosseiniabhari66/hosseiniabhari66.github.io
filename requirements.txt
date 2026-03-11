@@ -1,1 +1,2 @@
-scholarly
+beautifulsoup4
+requests

@@ -1,11 +1,11 @@
 import json
 import os
-from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
 from datetime import datetime, timezone
 from pathlib import Path
-from urllib.parse import parse_qs, urlparse
+from urllib.parse import parse_qs, urlencode, urlparse
 
-from scholarly import scholarly
+import requests
+from bs4 import BeautifulSoup
 
 
 def normalize_scholar_user_id(raw_value: str) -> str:
@@ -40,46 +40,94 @@ def resolve_scholar_user_id() -> str:
     )
 
 
-def run_with_timeout(callable_obj, timeout_seconds: int):
-    with ThreadPoolExecutor(max_workers=1) as executor:
-        future = executor.submit(callable_obj)
-        try:
-            return future.result(timeout=timeout_seconds)
-        except FuturesTimeoutError as exc:
+def parse_int(value: str) -> int:
+    text = (value or "").strip().replace(",", "")
+    if text.isdigit():
+        return int(text)
+    return 0
+
+
+def fetch_publications(scholar_user_id: str, max_pubs: int, request_timeout: int):
+    headers = {
+        "User-Agent": (
+            "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
+            "(KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36"
+        )
+    }
+    publications = []
+    page_size = 100
+    cstart = 0
+
+    while len(publications) < max_pubs:
+        params = {
+            "view_op": "list_works",
+            "hl": "en",
+            "user": scholar_user_id,
+            "cstart": str(cstart),
+            "pagesize": str(page_size),
+        }
+        url = "https://scholar.google.com/citations?" + urlencode(params)
+        print(f"Fetching page offset {cstart}...", flush=True)
+        response = requests.get(url, headers=headers, timeout=request_timeout)
+        response.raise_for_status()
+        html = response.text
+        html_lower = html.lower()
+        if "unusual traffic" in html_lower or "not a robot" in html_lower:
             raise RuntimeError(
-                f"Google Scholar request timed out after {timeout_seconds}s. "
-                "Try again later or reduce SCHOLAR_MAX_PUBLICATIONS."
-            ) from exc
+                "Google Scholar blocked this request (captcha/anti-bot). "
+                "Try rerunning later; GitHub-hosted runners are sometimes blocked."
+            )
+
+        soup = BeautifulSoup(html, "html.parser")
+        rows = soup.select("tr.gsc_a_tr")
+        if not rows:
+            break
+
+        for row in rows:
+            title_node = row.select_one("a.gsc_a_at")
+            if not title_node:
+                continue
+            title = title_node.get_text(strip=True)
+            href = title_node.get("href", "").strip()
+            link = f"https://scholar.google.com{href}" if href else ""
+
+            gray_nodes = row.select("div.gs_gray")
+            authors = gray_nodes[0].get_text(strip=True) if len(gray_nodes) > 0 else ""
+            venue = gray_nodes[1].get_text(strip=True) if len(gray_nodes) > 1 else ""
+
+            citation_node = row.select_one("a.gsc_a_ac")
+            citations = parse_int(citation_node.get_text(strip=True) if citation_node else "")
+
+            year_node = row.select_one("td.gsc_a_y span")
+            year = (year_node.get_text(strip=True) if year_node else "").strip()
+
+            publications.append(
+                {
+                    "title": title,
+                    "authors": authors,
+                    "venue": venue,
+                    "year": year,
+                    "citations": citations,
+                    "url": link,
+                }
+            )
+            if len(publications) >= max_pubs:
+                break
+
+        cstart += page_size
+
+    return publications
 
 
 def main() -> None:
     scholar_user_id = resolve_scholar_user_id()
-    max_pubs_raw = os.getenv("SCHOLAR_MAX_PUBLICATIONS", "15").strip()
-    max_pubs = int(max_pubs_raw) if max_pubs_raw.isdigit() else 15
+    max_pubs_raw = os.getenv("SCHOLAR_MAX_PUBLICATIONS", "10").strip()
+    max_pubs = int(max_pubs_raw) if max_pubs_raw.isdigit() else 10
     timeout_raw = os.getenv("SCHOLAR_TIMEOUT_SECONDS", "120").strip()
-    timeout_seconds = int(timeout_raw) if timeout_raw.isdigit() else 120
+    timeout_seconds = int(timeout_raw) if timeout_raw.isdigit() else 90
 
     print(f"Fetching Google Scholar author: {scholar_user_id}", flush=True)
-    author = run_with_timeout(lambda: scholarly.search_author_id(scholar_user_id), timeout_seconds)
-    author = run_with_timeout(lambda: scholarly.fill(author, sections=["publications"]), timeout_seconds)
-
-    publication_rows = []
-    for pub in author.get("publications", [])[:max_pubs]:
-        # Avoid per-publication network calls to keep workflow fast and reliable.
-        bib = pub.get("bib", {})
-        pub_url = pub.get("pub_url", "")
-        citations = pub.get("num_citations", 0)
-
-        publication_rows.append(
-            {
-                "title": bib.get("title", "").strip(),
-                "authors": bib.get("author", "").strip(),
-                "venue": (bib.get("journal") or bib.get("venue") or "").strip(),
-                "year": str(bib.get("pub_year", "")).strip(),
-                "citations": int(citations) if str(citations).isdigit() else 0,
-                "url": pub_url.strip(),
-            }
-        )
+    publication_rows = fetch_publications(scholar_user_id, max_pubs, timeout_seconds)
 
     publication_rows.sort(
         key=lambda x: (x.get("year", ""), x.get("citations", 0)),
