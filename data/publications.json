@@ -1,7 +1,80 @@
 {
   "source": "orcid",
-  "orcid_id": "",
-  "profile_url": "https://orcid.org/",
-  "updated_at": "Not updated yet",
-  "publications": []
+  "orcid_id": "0000-0003-4477-4289",
+  "profile_url": "https://orcid.org/0000-0003-4477-4289",
+  "updated_at": "2026-03-11T11:52:55.444986+00:00",
+  "publications": [
+    {
+      "title": "Extensive analysis of the lattice Boltzmann method on shifted stencils",
+      "authors": "",
+      "venue": "Physical Review E",
+      "year": "2019",
+      "citations": 0,
+      "url": "https://doi.org/10.1103/PhysRevE.100.063301"
+    },
+    {
+      "title": "Hybrid Lattice Boltzmann-finite difference model for low mach number combustion simulation",
+      "authors": "",
+      "venue": "Combustion and Flame",
+      "year": "2019",
+      "citations": 0,
+      "url": "https://doi.org/10.1016/j.combustflame.2019.07.041"
+    },
+    {
+      "title": "Effect of particle density in turbulent channel flows with resolved oblate spheroids",
+      "authors": "",
+      "venue": "Computers & Fluids",
+      "year": "2019",
+      "citations": 0,
+      "url": "https://doi.org/10.1016/j.compfluid.2019.01.027"
+    },
+    {
+      "title": "Lattice Boltzmann advection-diffusion model for conjugate heat transfer in heterogeneous media",
+      "authors": "",
+      "venue": "International Journal of Heat and Mass Transfer",
+      "year": "2019",
+      "citations": 0,
+      "url": "https://doi.org/10.1016/j.ijheatmasstransfer.2018.12.034"
+    },
+    {
+      "title": "Mass-conserving advection\u2013diffusion Lattice Boltzmann model for multi-species reacting flows",
+      "authors": "",
+      "venue": "Physica A: Statistical Mechanics and its Applications",
+      "year": "2018",
+      "citations": 0,
+      "url": "https://doi.org/10.1016/j.physa.2018.01.034"
+    },
+    {
+      "title": "Immersed boundary lattice Boltzmann simulation of turbulent channel flows in the presence of spherical particles",
+      "authors": "",
+      "venue": "International Journal of Multiphase Flow",
+      "year": "2017",
+      "citations": 0,
+      "url": "https://doi.org/10.1016/j.ijmultiphaseflow.2017.07.011"
+    },
+    {
+      "title": "Weakly compressible Lattice Boltzmann simulations of reacting flows with detailed thermo-chemical models",
+      "authors": "",
+      "venue": "Computers & Mathematics with Applications",
+      "year": "2017",
+      "citations": 0,
+      "url": "https://doi.org/10.1016/j.camwa.2017.08.045"
+    },
+    {
+      "title": "Fully-resolved prolate spheroids in turbulent channel flows: A lattice Boltzmann study",
+      "authors": "",
+      "venue": "AIP Advances",
+      "year": "2017",
+      "citations": 0,
+      "url": "https://doi.org/10.1063/1.5002528"
+    },
+    {
+      "title": "Stability limits of the single relaxation-time advection-diffusion lattice Boltzmann scheme",
+      "authors": "",
+      "venue": "International Journal of Modern Physics C",
+      "year": "2017",
+      "citations": 0,
+      "url": "https://doi.org/10.1142/S0129183117501418"
+    }
+  ]
 }
