@@ -1,0 +1,130 @@
+:root {
+  --bg: #0b1020;
+  --panel: #131a2c;
+  --text: #e6edf7;
+  --muted: #9ca8bf;
+  --border: #27324b;
+  --accent: #64d2ff;
+  --accent-strong: #25b8f0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: linear-gradient(180deg, #0b1020 0%, #0f1527 100%);
+  color: var(--text);
+  font-family: "Segoe UI", Roboto, Arial, sans-serif;
+  line-height: 1.6;
+}
+
+.container {
+  width: min(980px, 92%);
+  margin: 0 auto;
+}
+
+.site-header {
+  border-bottom: 1px solid var(--border);
+  padding: 2.5rem 0 1.25rem;
+}
+
+h1 {
+  margin: 0;
+  letter-spacing: 0.2px;
+}
+
+.tagline {
+  margin: 0.35rem 0 1rem;
+  color: var(--muted);
+}
+
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+}
+
+.nav a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.nav a:hover {
+  color: var(--accent-strong);
+  text-decoration: underline;
+}
+
+main {
+  padding: 1.5rem 0 2rem;
+}
+
+.panel {
+  background: rgba(19, 26, 44, 0.85);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.2rem 1.1rem;
+  margin-bottom: 1rem;
+}
+
+h2 {
+  margin-top: 0;
+}
+
+.card {
+  background: rgba(12, 18, 33, 0.7);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem;
+  margin-top: 0.9rem;
+}
+
+.meta {
+  color: var(--muted);
+  margin-top: 0.4rem;
+}
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.button {
+  border: 1px solid var(--accent-strong);
+  color: var(--accent);
+  padding: 0.45rem 0.75rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.button:hover {
+  background: rgba(37, 184, 240, 0.14);
+}
+
+.note {
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+a {
+  color: var(--accent);
+}
+
+a:hover {
+  color: var(--accent-strong);
+}
+
+.site-footer {
+  border-top: 1px solid var(--border);
+  padding: 1rem 0 2rem;
+  color: var(--muted);
+}

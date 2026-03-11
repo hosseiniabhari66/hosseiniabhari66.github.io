@@ -1,44 +1,82 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
 <head>
-  <title>Your Name</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hossein | Engineering and Research</title>
+  <meta
+    name="description"
+    content="Personal academic and engineering website of Hossein: computational engineering, LBM, CFD, and scientific software."
+  />
+  <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
+  <header class="site-header">
+    <div class="container">
+      <h1>Hossein</h1>
+      <p class="tagline">Computational Engineering | LBM | Scientific Computing</p>
+      <nav class="nav">
+        <a href="index.html" aria-current="page">Home</a>
+        <a href="projects.html">Projects</a>
+        <a href="publications.html">Publications</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </div>
+  </header>
 
-<nav>
-  <h2>Your Name</h2>
-  <div>
-    <a href="index.html">Home</a>
-    <a href="about.html">About</a>
-    <a href="projects.html">Projects</a>
-  </div>
-</nav>
+  <main class="container">
+    <section class="panel">
+      <h2>About</h2>
+      <p>
+        I am an engineering researcher focused on computational modeling and simulation.
+        My interests include lattice Boltzmann methods, transport in porous media, and
+        high-performance scientific software.
+      </p>
+      <p>
+        This website highlights selected technical projects, publication records, and
+        ways to collaborate.
+      </p>
+    </section>
 
-<section class="hero">
-  <h1>Hello 👋</h1>
-  <p>I'm Your Ali — a developer interested in AI, software and data.</p>
-</section>
+    <section class="panel">
+      <h2>Research Areas</h2>
+      <ul>
+        <li>Lattice Boltzmann methods and multiphysics modeling</li>
+        <li>Computational fluid dynamics for engineering applications</li>
+        <li>Parallel and distributed simulation workflows</li>
+        <li>Numerical methods and scientific Python tooling</li>
+      </ul>
+    </section>
 
-<section>
-  <h2>Featured Work</h2>
+    <section class="panel">
+      <h2>Quick Links</h2>
+      <div class="links">
+        <a class="button" href="projects.html">View Projects</a>
+        <a class="button" href="publications.html">View Publications</a>
+        <a class="button" href="cv.pdf">Download CV</a>
+      </div>
+      <p class="note">
+        Add your `cv.pdf` in this folder before publishing.
+      </p>
+    </section>
 
-  <div class="card">
-    <h3>Project 1</h3>
-    <p>Short description of your project.</p>
-  </div>
+    <section class="panel" id="contact">
+      <h2>Contact</h2>
+      <p>Email: your.email@domain.com</p>
+      <p>
+        <a href="https://github.com/yourusername">GitHub</a> |
+        <a href="https://scholar.google.com/">Google Scholar</a> |
+        <a href="https://www.linkedin.com/">LinkedIn</a>
+      </p>
+    </section>
+  </main>
 
-  <div class="card">
-    <h3>Project 2</h3>
-    <p>Short description of another project.</p>
-  </div>
+  <footer class="site-footer">
+    <div class="container">
+      <small>&copy; <span id="year"></span> Hossein. All rights reserved.</small>
+    </div>
+  </footer>
 
-</section>
-
-<footer>
-  <p>© 2026 Your Name</p>
-</footer>
-
+  <script src="script.js"></script>
 </body>
 </html>
