@@ -1,13 +1,26 @@
 import json
 import os
+from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
 from datetime import datetime, timezone
 from pathlib import Path
+from urllib.parse import parse_qs, urlparse
 
 from scholarly import scholarly
 
 
+def normalize_scholar_user_id(raw_value: str) -> str:
+    value = raw_value.strip()
+    if not value:
+        return ""
+    if "scholar.google.com" not in value:
+        return value
+    parsed = urlparse(value)
+    user_values = parse_qs(parsed.query).get("user", [])
+    return user_values[0].strip() if user_values else ""
+
+
 def resolve_scholar_user_id() -> str:
-    env_value = os.getenv("SCHOLAR_USER_ID", "").strip()
+    env_value = normalize_scholar_user_id(os.getenv("SCHOLAR_USER_ID", ""))
     if env_value:
         return env_value
 
@@ -15,7 +28,7 @@ def resolve_scholar_user_id() -> str:
     if fallback_file.exists():
         try:
             payload = json.loads(fallback_file.read_text(encoding="utf-8"))
-            file_value = str(payload.get("scholar_user_id", "")).strip()
+            file_value = normalize_scholar_user_id(str(payload.get("scholar_user_id", "")))
             if file_value:
                 return file_value
         except json.JSONDecodeError:
@@ -27,20 +40,35 @@ def resolve_scholar_user_id() -> str:
     )
 
 
+def run_with_timeout(callable_obj, timeout_seconds: int):
+    with ThreadPoolExecutor(max_workers=1) as executor:
+        future = executor.submit(callable_obj)
+        try:
+            return future.result(timeout=timeout_seconds)
+        except FuturesTimeoutError as exc:
+            raise RuntimeError(
+                f"Google Scholar request timed out after {timeout_seconds}s. "
+                "Try again later or reduce SCHOLAR_MAX_PUBLICATIONS."
+            ) from exc
+
+
 def main() -> None:
     scholar_user_id = resolve_scholar_user_id()
-    max_pubs_raw = os.getenv("SCHOLAR_MAX_PUBLICATIONS", "30").strip()
-    max_pubs = int(max_pubs_raw) if max_pubs_raw.isdigit() else 30
+    max_pubs_raw = os.getenv("SCHOLAR_MAX_PUBLICATIONS", "15").strip()
+    max_pubs = int(max_pubs_raw) if max_pubs_raw.isdigit() else 15
+    timeout_raw = os.getenv("SCHOLAR_TIMEOUT_SECONDS", "120").strip()
+    timeout_seconds = int(timeout_raw) if timeout_raw.isdigit() else 120
 
-    author = scholarly.search_author_id(scholar_user_id)
-    author = scholarly.fill(author, sections=["publications"])
+    print(f"Fetching Google Scholar author: {scholar_user_id}", flush=True)
+    author = run_with_timeout(lambda: scholarly.search_author_id(scholar_user_id), timeout_seconds)
+    author = run_with_timeout(lambda: scholarly.fill(author, sections=["publications"]), timeout_seconds)
 
     publication_rows = []
     for pub in author.get("publications", [])[:max_pubs]:
-        filled = scholarly.fill(pub)
-        bib = filled.get("bib", {})
-        pub_url = filled.get("pub_url", "")
-        citations = filled.get("num_citations", 0)
+        # Avoid per-publication network calls to keep workflow fast and reliable.
+        bib = pub.get("bib", {})
+        pub_url = pub.get("pub_url", "")
+        citations = pub.get("num_citations", 0)
 
         publication_rows.append(
             {
@@ -68,7 +96,7 @@ def main() -> None:
     output_file = Path("data") / "publications.json"
     output_file.parent.mkdir(parents=True, exist_ok=True)
     output_file.write_text(json.dumps(payload, indent=2, ensure_ascii=True) + "\n", encoding="utf-8")
-    print(f"Wrote {len(publication_rows)} publications to {output_file}")
+    print(f"Wrote {len(publication_rows)} publications to {output_file}", flush=True)
 
 
 if __name__ == "__main__":

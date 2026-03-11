@@ -56,11 +56,15 @@ from your Google Scholar profile and renders it on `publications.html`.
 2. In your GitHub repository, go to **Settings -> Secrets and variables -> Actions**.
 3. Create repository variable (preferred):
    - Name: `SCHOLAR_USER_ID`
-   - Value: your Google Scholar user id (only the id string).
+   - Value: your Google Scholar user id (only the id string, e.g., `78p5mUIAAAAJ`).
+   - Note: a full Scholar URL is also accepted now; the script extracts `user=...`.
 4. Optional: create repository variable:
    - Name: `SCHOLAR_MAX_PUBLICATIONS`
    - Value: max number of items, e.g., `30`
-5. Run the workflow once manually:
+5. Optional: create repository variable:
+   - Name: `SCHOLAR_TIMEOUT_SECONDS`
+   - Value: request timeout in seconds, e.g., `120`
+6. Run the workflow once manually:
    - **Actions -> Update Publications -> Run workflow**
 
 Alternative fallback if you do not want settings:

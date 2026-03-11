@@ -11,6 +11,7 @@ permissions:
 jobs:
   update:
     runs-on: ubuntu-latest
+    timeout-minutes: 12
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -27,7 +28,8 @@ jobs:
         env:
           SCHOLAR_USER_ID: ${{ vars.SCHOLAR_USER_ID || secrets.SCHOLAR_USER_ID }}
           SCHOLAR_MAX_PUBLICATIONS: ${{ vars.SCHOLAR_MAX_PUBLICATIONS }}
-        run: python scripts/update_publications.py
+          SCHOLAR_TIMEOUT_SECONDS: ${{ vars.SCHOLAR_TIMEOUT_SECONDS }}
+        run: python -u scripts/update_publications.py
 
       - name: Commit and push if data changed
         run: |
