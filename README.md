@@ -36,3 +36,38 @@ This folder contains a complete starter website for a professional academic/engi
 - Connect a custom domain via a `CNAME` file.
 - Add analytics (Plausible or Google Analytics).
 - Add a blog section (`blog.html`) and RSS feed.
+
+## Automatic Publications from Google Scholar
+
+This repository includes an automated pipeline that updates `data/publications.json`
+from your Google Scholar profile and renders it on `publications.html`.
+
+### Included Files
+
+- `scripts/update_publications.py` - Fetches publications from Google Scholar.
+- `.github/workflows/update-publications.yml` - Runs on schedule and manual trigger.
+- `data/publications.json` - Generated data consumed by `publications.js`.
+- `publications.js` - Renders publication list in browser.
+
+### One-Time Setup
+
+1. Open your Google Scholar profile and copy the `user=` parameter from the URL.
+   Example: `https://scholar.google.com/citations?user=ABC123XYZ...`
+2. In your GitHub repository, go to **Settings -> Secrets and variables -> Actions**.
+3. Create repository variable (preferred):
+   - Name: `SCHOLAR_USER_ID`
+   - Value: your Google Scholar user id (only the id string).
+4. Optional: create repository variable:
+   - Name: `SCHOLAR_MAX_PUBLICATIONS`
+   - Value: max number of items, e.g., `30`
+5. Run the workflow once manually:
+   - **Actions -> Update Publications -> Run workflow**
+
+Alternative fallback if you do not want settings:
+- Put your id directly in `data/publications.json` under `scholar_user_id`.
+
+### Notes
+
+- Google Scholar has no official public API; this method relies on scraping and may
+  occasionally fail due to anti-bot protections.
+- If a run fails, rerun the workflow later from the Actions tab.

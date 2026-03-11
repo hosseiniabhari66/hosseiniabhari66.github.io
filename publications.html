@@ -22,37 +22,22 @@
 
   <main class="container">
     <section class="panel">
-      <h2>Journal Articles</h2>
-      <ol>
-        <li>
-          Lastname, A., <strong>Hossein, B.</strong>, Lastname, C. (2026).
-          Paper title goes here. <em>Journal Name</em>, 12(3), 100-115.
-        </li>
-        <li>
-          Lastname, D., <strong>Hossein, B.</strong> (2025). Another paper title.
-          <em>Journal Name</em>, 9(1), 1-15.
-        </li>
-      </ol>
-    </section>
-
-    <section class="panel">
-      <h2>Conference Papers</h2>
-      <ol>
-        <li>
-          <strong>Hossein, B.</strong>, Lastname, E. (2025). Conference contribution title.
-          In <em>Proceedings of Conference Name</em>.
-        </li>
-      </ol>
+      <h2>Publication List</h2>
+      <p class="note">
+        This list is updated automatically from Google Scholar using a scheduled GitHub Action.
+      </p>
+      <ol id="publication-list" class="publication-list"></ol>
+      <p id="publication-status" class="note"></p>
     </section>
 
     <section class="panel">
       <h2>Profiles</h2>
       <p>
-        <a href="https://scholar.google.com/">Google Scholar</a> |
+        <a id="scholar-profile-link" href="https://scholar.google.com/">Google Scholar</a> |
         <a href="https://orcid.org/">ORCID</a> |
         <a href="https://github.com/yourusername">GitHub</a>
       </p>
-      <p class="note">Replace placeholders with your actual publication data and profile links.</p>
+      <p class="note">Update your profile links in this page once.</p>
     </section>
   </main>
 
@@ -63,5 +48,6 @@
   </footer>
 
   <script src="script.js"></script>
+  <script src="publications.js"></script>
 </body>
 </html>
