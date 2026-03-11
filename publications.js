@@ -1,7 +1,7 @@
 async function renderPublications() {
   const list = document.getElementById("publication-list");
   const status = document.getElementById("publication-status");
-  const scholarLink = document.getElementById("scholar-profile-link");
+  const profileLink = document.getElementById("profile-link");
 
   if (!list || !status) {
     return;
@@ -16,8 +16,9 @@ async function renderPublications() {
     const payload = await response.json();
     const publications = Array.isArray(payload.publications) ? payload.publications : [];
 
-    if (payload.scholar_profile_url && scholarLink) {
-      scholarLink.href = payload.scholar_profile_url;
+    const dynamicProfileUrl = payload.profile_url || payload.scholar_profile_url;
+    if (dynamicProfileUrl && profileLink) {
+      profileLink.href = dynamicProfileUrl;
     }
 
     if (publications.length === 0) {
@@ -34,11 +35,12 @@ async function renderPublications() {
       const year = item.year || "N/A";
       const citations = item.citations ?? 0;
       const link = item.url || "#";
+      const citationText = citations > 0 ? ` | Citations: ${citations}` : "";
 
       li.innerHTML =
         `<strong>${title}</strong><br>` +
         `<span>${authors}</span><br>` +
-        `<em>${venue}</em> (${year}) | Citations: ${citations} ` +
+        `<em>${venue}</em> (${year})${citationText} ` +
         (item.url ? `| <a href="${link}" target="_blank" rel="noopener noreferrer">Link</a>` : "");
       list.appendChild(li);
     });
