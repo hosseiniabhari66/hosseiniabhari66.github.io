@@ -29,6 +29,7 @@ jobs:
           SCHOLAR_USER_ID: ${{ vars.SCHOLAR_USER_ID || secrets.SCHOLAR_USER_ID }}
           SCHOLAR_MAX_PUBLICATIONS: ${{ vars.SCHOLAR_MAX_PUBLICATIONS }}
           SCHOLAR_TIMEOUT_SECONDS: ${{ vars.SCHOLAR_TIMEOUT_SECONDS }}
+          SERPAPI_API_KEY: ${{ secrets.SERPAPI_API_KEY || vars.SERPAPI_API_KEY }}
         run: python -u scripts/update_publications.py
 
       - name: Commit and push if data changed

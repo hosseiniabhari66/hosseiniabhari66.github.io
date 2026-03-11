@@ -64,7 +64,10 @@ from your Google Scholar profile and renders it on `publications.html`.
 5. Optional: create repository variable:
    - Name: `SCHOLAR_TIMEOUT_SECONDS`
    - Value: request timeout in seconds, e.g., `120`
-6. Run the workflow once manually:
+6. Optional but recommended for GitHub-hosted runners:
+   - Name: `SERPAPI_API_KEY`
+   - Value: your SerpAPI key (set as a repository secret preferred).
+7. Run the workflow once manually:
    - **Actions -> Update Publications -> Run workflow**
 
 Alternative fallback if you do not want settings:
@@ -76,4 +79,6 @@ Alternative fallback if you do not want settings:
   occasionally fail due to anti-bot protections.
 - GitHub-hosted runners can be blocked by Scholar; in that case, rerun later or use
   a personal/self-hosted runner for higher reliability.
+- If `SERPAPI_API_KEY` is configured, the workflow automatically falls back to SerpAPI
+  when direct Scholar scraping receives HTTP 403.
 - If a run fails, rerun the workflow later from the Actions tab.

@@ -119,15 +119,89 @@ def fetch_publications(scholar_user_id: str, max_pubs: int, request_timeout: int
     return publications
 
 
+def fetch_publications_via_serpapi(
+    scholar_user_id: str, max_pubs: int, request_timeout: int, serpapi_api_key: str
+):
+    publications = []
+    start = 0
+    batch = 100
+    profile_url = f"https://scholar.google.com/citations?user={scholar_user_id}"
+
+    while len(publications) < max_pubs:
+        params = {
+            "engine": "google_scholar_author",
+            "author_id": scholar_user_id,
+            "hl": "en",
+            "start": str(start),
+            "num": str(batch),
+            "api_key": serpapi_api_key,
+        }
+        print(f"Fetching via SerpAPI offset {start}...", flush=True)
+        response = requests.get("https://serpapi.com/search.json", params=params, timeout=request_timeout)
+        response.raise_for_status()
+        payload = response.json()
+
+        author_data = payload.get("author", {}) if isinstance(payload, dict) else {}
+        profile_url = author_data.get("link", profile_url)
+
+        articles = payload.get("articles", []) if isinstance(payload, dict) else []
+        if not articles:
+            break
+
+        for article in articles:
+            if not isinstance(article, dict):
+                continue
+            cited_raw = article.get("cited_by", {})
+            if isinstance(cited_raw, dict):
+                cited_val = cited_raw.get("value", 0)
+            else:
+                cited_val = cited_raw
+            citations = parse_int(str(cited_val))
+
+            publications.append(
+                {
+                    "title": (article.get("title") or article.get("article_title") or "").strip(),
+                    "authors": (article.get("authors") or "").strip(),
+                    "venue": (article.get("publication") or article.get("source") or "").strip(),
+                    "year": str(article.get("year", "")).strip(),
+                    "citations": citations,
+                    "url": (article.get("link") or "").strip(),
+                }
+            )
+            if len(publications) >= max_pubs:
+                break
+
+        start += len(articles)
+
+    return publications, profile_url
+
+
 def main() -> None:
     scholar_user_id = resolve_scholar_user_id()
     max_pubs_raw = os.getenv("SCHOLAR_MAX_PUBLICATIONS", "10").strip()
     max_pubs = int(max_pubs_raw) if max_pubs_raw.isdigit() else 10
     timeout_raw = os.getenv("SCHOLAR_TIMEOUT_SECONDS", "120").strip()
     timeout_seconds = int(timeout_raw) if timeout_raw.isdigit() else 90
+    serpapi_api_key = os.getenv("SERPAPI_API_KEY", "").strip()
+    scholar_profile_url = f"https://scholar.google.com/citations?user={scholar_user_id}"
 
     print(f"Fetching Google Scholar author: {scholar_user_id}", flush=True)
-    publication_rows = fetch_publications(scholar_user_id, max_pubs, timeout_seconds)
+    try:
+        publication_rows = fetch_publications(scholar_user_id, max_pubs, timeout_seconds)
+    except requests.HTTPError as exc:
+        status = exc.response.status_code if exc.response is not None else None
+        if status == 403 and serpapi_api_key:
+            print("Direct Scholar blocked (403). Falling back to SerpAPI...", flush=True)
+            publication_rows, scholar_profile_url = fetch_publications_via_serpapi(
+                scholar_user_id, max_pubs, timeout_seconds, serpapi_api_key
+            )
+        elif status == 403:
+            raise RuntimeError(
+                "Google Scholar returned 403 on GitHub runner. "
+                "Set SERPAPI_API_KEY (secret) for fallback or use a self-hosted runner."
+            ) from exc
+        else:
+            raise
 
     publication_rows.sort(
         key=lambda x: (x.get("year", ""), x.get("citations", 0)),
@@ -136,7 +210,7 @@ def main() -> None:
 
     payload = {
         "scholar_user_id": scholar_user_id,
-        "scholar_profile_url": f"https://scholar.google.com/citations?user={scholar_user_id}",
+        "scholar_profile_url": scholar_profile_url,
         "updated_at": datetime.now(timezone.utc).isoformat(),
         "publications": publication_rows,
     }
