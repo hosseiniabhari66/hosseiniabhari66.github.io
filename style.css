@@ -78,6 +78,19 @@ h2 {
   margin-top: 0;
 }
 
+.profile-figure {
+  margin: 0 0 1rem;
+}
+
+.profile-image {
+  display: block;
+  width: min(220px, 100%);
+  height: auto;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: rgba(12, 18, 33, 0.7);
+}
+
 .card {
   background: rgba(12, 18, 33, 0.7);
   border: 1px solid var(--border);
